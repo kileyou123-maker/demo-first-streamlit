@@ -95,7 +95,7 @@ if data:
 
         # 抓出該列目前的數值，用來預設填入修改表單
         current_data = data[selected_row_update - 2]
-       with st.form("update_data_form"):
+        with st.form("update_data_form"):
             new_name = st.text_input("新姓名", value=current_data["姓名"])
             new_qty = st.number_input("新數量", min_value=0, value=int(current_data["數量"]))
             update_submitted = st.form_submit_button("更新資料")
