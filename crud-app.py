@@ -22,13 +22,17 @@ SHEET_INPUT = "試算表網址"
 WORKSHEET_NAME = "工作表1"
 
 try:
-    if SHEET_INPUT.startswith("http://") or SHEET_INPUT.startswith("https://"):
-        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1aY9MTB9_bumFE4t7ipwHdkWrvuqYEkeNVF3YWtBLoKU/edit")
-    else:
-        sh = gc.open(SHEET_INPUT)
-    worksheet = sh.worksheet(WORKSHEET_NAME)
+    # 使用正確的網址並加上引號
+    sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1aY9MTB9_bumFE4t7ipwHdkWrvuqYEkeNVF3YWtBLoKU/edit")
+    # 確保名稱與試算表內的分頁名稱一致
+    worksheet = sh.worksheet("工作表1") 
+    
+    # 成功開啟後才讀取資料
+    data = worksheet.get_all_records()
+    st.write(data)
+
 except Exception as e:
-    st.error(f"無法開啟試算表，請確認名稱/網址是否正確，且服務帳號 (jessica@automatic-time-489007-g8.iam.gserviceaccount.com) 已被加入共用編輯者！\n錯誤訊息：{e}")
+    st.error(f"連線失敗！請檢查服務帳號是否已加入編輯者。錯誤訊息：{e}")
 
 st.title("📊 Google Sheets 讀寫測試儀表板")
 
