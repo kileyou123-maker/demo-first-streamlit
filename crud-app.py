@@ -1,4 +1,3 @@
-
 import streamlit as st
 import gspread
 import pandas as pd
@@ -30,7 +29,7 @@ try:
     worksheet = sh.worksheet(WORKSHEET_NAME)
 except Exception as e:
     st.error(
-        f"無法開啟試算表 服務帳號 ({jessica@automatic-time-489007-g8.iam.gserviceaccount.com}) 已被授權")
+        f"無法開啟試算表，請確認名稱/網址是否正確，且服務帳號 ({gc.auth.signer_email}) 已被加入共用編輯者！\n錯誤訊息：{e}")
     st.stop()
 
 st.title("📊 Google Sheets 讀寫測試儀表板")
