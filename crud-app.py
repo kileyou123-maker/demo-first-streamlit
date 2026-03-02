@@ -30,7 +30,7 @@ try:
     worksheet = sh.worksheet(WORKSHEET_NAME)
 except Exception as e:
     st.error(
-        f"無法開啟試算表 服務帳號 ({jessica@automatic-time-489007-g8.iam.gserviceaccount.com}) 已被授權")
+        f"無法開啟試算表 服務帳號 ({demo-first-streamlit@automatic-time-489007-g8.iam.gserviceaccount.com}) 已被授權")
     st.stop()
 
 st.title("📊 Google Sheets 讀寫測試儀表板")
