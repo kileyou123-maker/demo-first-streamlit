@@ -22,17 +22,19 @@ SHEET_INPUT = "試算表網址"
 WORKSHEET_NAME = "工作表1"
 
 try:
-    # 使用正確的網址並加上引號
+    # 1. 確保網址有加引號，且信箱已在 Google Sheets 設定為「編輯者」
     sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1aY9MTB9_bumFE4t7ipwHdkWrvuqYEkeNVF3YWtBLoKU/edit")
-    # 確保名稱與試算表內的分頁名稱一致
+    
+    # 2. 你的分頁名稱是「工作表1」，請確保這裡完全一致
     worksheet = sh.worksheet("工作表1") 
     
-    # 成功開啟後才讀取資料
+    # 3. 將讀取資料移入 try 區塊，確保只有連線成功才會執行
     data = worksheet.get_all_records()
     st.write(data)
 
 except Exception as e:
-    st.error(f"連線失敗！請檢查服務帳號是否已加入編輯者。錯誤訊息：{e}")
+    # 如果連線失敗，會停在這裡並顯示錯誤，不會往下執行第 44 行
+    st.error(f"連線失敗！請確認服務帳號信箱已加入編輯者。錯誤詳情：{e}")
 
 st.title("📊 Google Sheets 讀寫測試儀表板")
 
