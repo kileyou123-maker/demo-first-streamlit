@@ -23,7 +23,7 @@ WORKSHEET_NAME = "工作表1"
 
 try:
     if SHEET_INPUT.startswith("http://") or SHEET_INPUT.startswith("https://"):
-        sh = gc.open_by_url(https://docs.google.com/spreadsheets/d/1aY9MTB9_bumFE4t7ipwHdkWrvuqYEkeNVF3YWtBLoKU/edit?hl=zh-tw&gid=0#gid=0)
+        sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1aY9MTB9_bumFE4t7ipwHdkWrvuqYEkeNVF3YWtBLoKU/edit")
     else:
         sh = gc.open(SHEET_INPUT)
     worksheet = sh.worksheet(WORKSHEET_NAME)
