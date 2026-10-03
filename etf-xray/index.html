@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07110d">
+<title>ETF X-RAY — 看懂 ETF，不只看報酬</title>
+<meta name="description" content="ETF 深度研究工具：回撤、恢復時間、定期定額情境、ETF 重疊與新手投資教育。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <a class="brand" href="#" data-view="home"><span class="logo">X</span><span><b>ETF X-RAY</b><small>看懂 ETF，不只看報酬</small></span></a>
+  <nav>
+    <button data-view="explore">ETF 資料庫</button>
+    <button data-view="compare">比較</button>
+    <button data-view="dca">定期定額</button>
+    <button data-view="quiz">投資體質</button>
+  </nav>
+  <button class="credits" id="creditsBtn">5 點</button>
+</header>
+
+<main>
+<section id="home" class="view">
+  <div class="hero">
+    <div class="eyebrow">ETF DEEP RESEARCH FOR BEGINNERS</div>
+    <h1>別只看 ETF<br><em>漲了多少。</em></h1>
+    <p>真正該知道的是：最慘會跌多少、多久回得來、定期定額最倒楣的起點、以及你買的兩支 ETF 到底是不是同一批股票。</p>
+    <div class="hero-search">
+      <input id="heroSearch" autocomplete="off" placeholder="輸入代號，例如 0050、VOO、QQQ">
+      <button id="heroSearchBtn">X-RAY 分析 →</button>
+      <div class="search-results" id="heroResults"></div>
+    </div>
+    <div class="quick" id="quickTickers"></div>
+  </div>
+
+  <div class="demo-banner">
+    <b>目前是 MVP 示範資料模式</b>
+    <span>介面與計算流程已可使用；正式上線前會接合法/授權資料源，所有投資數據會標示來源、更新時間與公式。</span>
+  </div>
+
+  <section class="feature-grid">
+    <button class="feature" data-view="dca"><span>01</span><h3>最倒楣的定期定額</h3><p>不是只算平均報酬，而是看不同開始時間會遇到多深虧損、多久才轉正。</p></button>
+    <button class="feature" data-view="compare"><span>02</span><h3>你真的有分散嗎？</h3><p>比較兩支 ETF 的持股重疊、產業曝險與集中度，不再只看名字。</p></button>
+    <button class="feature" data-view="explore"><span>03</span><h3>回撤與恢復</h3><p>最大跌幅只是起點，更重要的是每次下跌後花多久回到前高。</p></button>
+    <button class="feature" data-view="quiz"><span>04</span><h3>先認識自己的風險</h3><p>問卷只做教育與風險特徵，不會直接告訴你該買哪一支 ETF。</p></button>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><div><small>DEEP SIGNALS</small><h2>一般網站很少一次算給你的東西</h2></div></div>
+    <div class="signal-list">
+      <div><b>Rolling Return</b><span>任意起點持有 3/5/10 年，不只從今天往回看。</span></div>
+      <div><b>Recovery Time</b><span>每次大跌後花多久回到前高。</span></div>
+      <div><b>Worst-start DCA</b><span>歷史最差月份開始扣款，過程到底有多難受。</span></div>
+      <div><b>Overlap X-Ray</b><span>兩檔 ETF 實際重複持有多少公司。</span></div>
+      <div><b>Fee Drag</b><span>費用率差異放到 10/20 年後會吃掉多少資產。</span></div>
+      <div><b>TWD Lens</b><span>未來正式版加入台灣投資人的匯率後總報酬。</span></div>
+    </div>
+  </section>
+</section>
+
+<section id="explore" class="view hidden">
+  <div class="page-head">
+    <div><div class="eyebrow">ETF DATABASE</div><h1>ETF 資料庫</h1><p>第一版先放種子資料驗證分析流程；資料層已獨立，後續擴充全台股／美股 ETF。</p></div>
+    <div class="searchbox"><input id="dbSearch" placeholder="搜尋代號、名稱、類型"></div>
+  </div>
+  <div class="filter-row" id="marketFilters"></div>
+  <div class="etf-grid" id="etfGrid"></div>
+</section>
+
+<section id="detail" class="view hidden">
+  <button class="back" data-view="explore">← ETF 資料庫</button>
+  <div id="detailContent"></div>
+</section>
+
+<section id="compare" class="view hidden">
+  <div class="page-head"><div><div class="eyebrow">OVERLAP X-RAY</div><h1>你真的有分散嗎？</h1><p>選兩支 ETF，比較底層持股重疊、集中度與風險特徵。</p></div></div>
+  <div class="compare-picker">
+    <label>ETF A<select id="compareA"></select></label>
+    <div class="vs">VS</div>
+    <label>ETF B<select id="compareB"></select></label>
+    <button class="primary" id="runCompare">開始 X-RAY</button>
+  </div>
+  <div id="compareResult"></div>
+</section>
+
+<section id="dca" class="view hidden">
+  <div class="page-head"><div><div class="eyebrow">DCA LAB</div><h1>定期定額不是只有一條結果</h1><p>用不同開始年份與市場情境，理解同一支 ETF 可能帶來完全不同的投資體驗。</p></div></div>
+  <div class="tool-card">
+    <div class="form-grid">
+      <label>ETF<select id="dcaTicker"></select></label>
+      <label>每月投入<input id="dcaAmount" type="number" min="1000" step="1000" value="5000"></label>
+      <label>持有時間<select id="dcaYears"><option value="5">5 年</option><option value="10" selected>10 年</option><option value="20">20 年</option></select></label>
+      <button class="primary" id="runDca">執行歷史情境</button>
+    </div>
+  </div>
+  <div id="dcaResult"></div>
+</section>
+
+<section id="quiz" class="view hidden">
+  <div class="page-head"><div><div class="eyebrow">INVESTOR EDUCATION</div><h1>先認識你的投資風險特徵</h1><p>這不是「推薦 ETF」問卷；結果只幫你理解波動承受、時間與現金流需求。</p></div></div>
+  <form id="quizForm" class="quiz-card">
+    <div class="q"><b>1. 這筆錢最早多久後可能需要用？</b><label><input type="radio" name="q1" value="0" required> 3 年內</label><label><input type="radio" name="q1" value="1"> 3–7 年</label><label><input type="radio" name="q1" value="2"> 7 年以上</label></div>
+    <div class="q"><b>2. 如果帳面突然下跌 20%，你的第一反應？</b><label><input type="radio" name="q2" value="0" required> 很可能停止投入或賣出</label><label><input type="radio" name="q2" value="1"> 先觀察一段時間</label><label><input type="radio" name="q2" value="2"> 仍按原計畫持續投入</label></div>
+    <div class="q"><b>3. 你目前是否有緊急預備金？</b><label><input type="radio" name="q3" value="0" required> 不足 3 個月生活費</label><label><input type="radio" name="q3" value="1"> 約 3–6 個月</label><label><input type="radio" name="q3" value="2"> 超過 6 個月</label></div>
+    <div class="q"><b>4. 你投資最重視什麼？</b><label><input type="radio" name="q4" value="0" required> 資產波動越小越好</label><label><input type="radio" name="q4" value="1"> 成長與穩定平衡</label><label><input type="radio" name="q4" value="2"> 願意承受波動換取成長機會</label></div>
+    <div class="q"><b>5. 每月可投入金額穩定嗎？</b><label><input type="radio" name="q5" value="0" required> 不穩定</label><label><input type="radio" name="q5" value="1"> 大致穩定</label><label><input type="radio" name="q5" value="2"> 非常穩定</label></div>
+    <button class="primary" type="submit">查看我的風險特徵</button>
+  </form>
+  <div id="quizResult"></div>
+</section>
+
+<section id="pricing" class="view hidden">
+  <div class="page-head"><div><div class="eyebrow">SMALL-PAY FIRST</div><h1>先用小額解鎖，不綁月費</h1><p>第一階段以點數驗證付費意願；付費買的是數據整理與研究工具，不是個人化買賣建議。</p></div></div>
+  <div class="pricing-grid">
+    <div class="price-card"><small>FREE</small><h2>NT$0</h2><p>ETF 基本資料、部分歷史數據、投資教育問卷。</p><button class="ghost">目前方案</button></div>
+    <div class="price-card featured"><small>STARTER</small><h2>NT$59</h2><p>5 點。可解鎖深度 X-RAY、重疊分析、進階 DCA 等工具。</p><button class="primary fake-pay" data-points="5">購買 5 點</button></div>
+    <div class="price-card"><small>VALUE</small><h2>NT$99</h2><p>10 點。適合一次比較多檔 ETF。</p><button class="primary fake-pay" data-points="10">購買 10 點</button></div>
+    <div class="price-card"><small>RESEARCH</small><h2>NT$199</h2><p>25 點。先驗證需求，未來再考慮訂閱。</p><button class="primary fake-pay" data-points="25">購買 25 點</button></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div><b>ETF X-RAY</b><span>研究工具，不是投資指示。</span></div>
+  <p>本 MVP 使用示範資料，不應作為投資決策依據。正式版將標示資料來源、更新日期、計算公式與資料授權狀態；不提供個人化買賣建議、進出場點或獲利保證。</p>
+</footer>
+</div>
+
+<div class="modal hidden" id="lockModal">
+  <div class="modal-card">
+    <button class="modal-close" id="closeModal">×</button>
+    <span class="lock-icon">⌁</span>
+    <h2>這是深度研究功能</h2>
+    <p id="lockText">解鎖 1 點即可查看完整分析。</p>
+    <div class="modal-actions"><button class="primary" id="usePoint">使用 1 點解鎖</button><button class="ghost" data-view="pricing" id="goPricing">看點數方案</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
