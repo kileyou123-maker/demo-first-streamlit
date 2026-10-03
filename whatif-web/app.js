@@ -131,8 +131,47 @@ function fallbackScene(){
   return JSON.parse(JSON.stringify(base));
 }
 
+function resetSceneArt(){
+  const art=$('#sceneArt'),status=$('#artStatus');
+  if(!art)return;
+  art.style.backgroundImage='';
+  art.classList.add('loading');
+  art.classList.remove('ready');
+  if(status){status.textContent='AI VISUAL';status.classList.add('hidden');}
+}
+
+async function generateSceneArt(scene,roundToken){
+  if(!window.puter?.ai?.txt2img||!state.ai||!scene)return;
+  const art=$('#sceneArt'),status=$('#artStatus');
+  if(!art)return;
+  status?.classList.remove('hidden');
+  art.classList.add('loading');
+  const prompt=`Cinematic still for a premium interactive alternate-life story.
+Scenario: ${state.scenario}
+Current scene: ${scene.title}
+Story moment: ${scene.text}
+Visual direction: realistic cinematic photography, dramatic natural lighting, emotionally charged but tasteful, contemporary Asia-neutral setting unless the scenario specifies otherwise, strong foreground subject, subtle depth of field, no text, no subtitles, no logos, no UI, no watermark. 16:9 composition.`;
+  try{
+    const img=await Promise.race([
+      puter.ai.txt2img(prompt,{model:'gemini-3.1-flash-lite-image',quality:'1K',ratio:{w:16,h:9}}),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('image timeout')),30000))
+    ]);
+    if(roundToken!==state.round||!img?.src)return;
+    const safe=String(img.src).replace(/"/g,'%22');
+    art.style.backgroundImage='url("'+safe+'")';
+    art.classList.remove('loading');
+    art.classList.add('ready');
+    if(status){status.textContent='AI VISUAL';setTimeout(()=>status.classList.add('hidden'),1300);}
+  }catch(err){
+    console.warn('AI image failed:',err);
+    art.classList.remove('loading');
+    status?.classList.add('hidden');
+  }
+}
+
 async function loadScene(){
   setLoading(true);
+  resetSceneArt();
   $('#roundLabel').textContent=`第 ${state.round+1} / 5 幕`;
   $('#progress').style.width=((state.round+1)/5*100)+'%';
   $('#worldTitle').textContent=state.scenario;
@@ -156,6 +195,7 @@ async function loadScene(){
   }
   setLoading(false);
   renderScene();
+  generateSceneArt(state.scene,state.round);
 }
 
 function renderScene(){
@@ -243,6 +283,7 @@ async function showResult(){
   $('#endingText').textContent=ending.desc;
   $('#tags').innerHTML=ending.tags.map((x,i)=>`<span class="tag ${i===0?'hot':''}">${x}</span>`).join('');
   window._ending={...ending,rarity};
+  buildShareCard();
 }
 
 function renderResultStats(){
@@ -255,15 +296,126 @@ function renderHistory(){
 function challengeUrl(){
   const u=new URL(location.href);u.searchParams.set('q',state.scenario);u.searchParams.set('challenge','1');return u.toString();
 }
+function roundRectPath(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+function wrapCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines=6){
+  const chars=Array.from(String(text||''));
+  let line='',lines=[];
+  for(const ch of chars){
+    const test=line+ch;
+    if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=ch;if(lines.length>=maxLines)break}
+    else line=test;
+  }
+  if(lines.length<maxLines&&line)lines.push(line);
+  lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));
+  return y+lines.length*lineHeight;
+}
+function buildShareCard(){
+  const e=window._ending||localEnding();
+  let holder=$('#resultCardPreview');
+  if(!holder){
+    holder=document.createElement('div');
+    holder.id='resultCardPreview';
+    holder.className='result-card-preview';
+    document.querySelector('.result-hero').insertAdjacentElement('afterend',holder);
+  }
+  holder.innerHTML='';
+  const canvas=document.createElement('canvas');
+  canvas.width=1080;canvas.height=1350;
+  const ctx=canvas.getContext('2d');
+  const g=ctx.createLinearGradient(0,0,1080,1350);
+  g.addColorStop(0,'#182238');g.addColorStop(.48,'#10151f');g.addColorStop(1,'#090b11');
+  ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
+
+  const glow=ctx.createRadialGradient(860,120,10,860,120,430);
+  glow.addColorStop(0,'rgba(200,255,61,.30)');glow.addColorStop(.42,'rgba(110,231,255,.08)');glow.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=glow;ctx.fillRect(430,-220,650,650);
+
+  ctx.fillStyle='#f7f8fb';ctx.font='900 34px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('WHAT IF?',76,92);
+  ctx.fillStyle='#8995a8';ctx.font='700 20px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('MY PARALLEL LIFE',76,128);
+
+  ctx.fillStyle='rgba(200,255,61,.11)';roundRectPath(ctx,76,176,430,54,27);ctx.fill();
+  ctx.strokeStyle='rgba(200,255,61,.35)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#c8ff3d';ctx.font='800 20px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('只有 '+(e.rarity||'少數')+'% 玩家走到相近結局',98,211);
+
+  ctx.fillStyle='#97a1b2';ctx.font='700 22px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('我的 WHAT IF',76,292);
+  ctx.fillStyle='#eef1f5';ctx.font='800 30px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  let y=wrapCanvasText(ctx,state.scenario,76,336,920,43,3)+34;
+
+  ctx.fillStyle='#c8ff3d';ctx.font='950 76px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  y=wrapCanvasText(ctx,e.title,76,y,920,82,3)+32;
+
+  ctx.fillStyle='#c9d0dc';ctx.font='500 26px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  y=wrapCanvasText(ctx,e.desc,76,y,920,40,5)+34;
+
+  const names={money:'資產',happy:'幸福',fame:'影響力',trust:'關係'};
+  const statY=Math.min(940,Math.max(790,y));
+  const entries=Object.entries(state.stats);
+  entries.forEach(([k,v],i)=>{
+    const x=76+(i%2)*466, yy=statY+Math.floor(i/2)*124;
+    ctx.fillStyle='rgba(255,255,255,.045)';roundRectPath(ctx,x,yy,438,98,20);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#8995a8';ctx.font='700 18px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';ctx.fillText(names[k],x+24,yy+34);
+    ctx.fillStyle='#f7f8fb';ctx.font='900 38px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';ctx.fillText(String(v),x+24,yy+76);
+  });
+
+  const tagY=statY+280;
+  let tx=76;
+  (e.tags||[]).slice(0,3).forEach((tag,i)=>{
+    ctx.font='800 20px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+    const w=Math.min(280,ctx.measureText(tag).width+44);
+    ctx.fillStyle=i===0?'#c8ff3d':'rgba(255,255,255,.055)';
+    roundRectPath(ctx,tx,tagY,w,52,26);ctx.fill();
+    if(i!==0){ctx.strokeStyle='rgba(255,255,255,.10)';ctx.stroke();}
+    ctx.fillStyle=i===0?'#0a0d11':'#e2e7ee';ctx.fillText(tag,tx+22,tagY+34);
+    tx+=w+12;
+  });
+
+  ctx.fillStyle='#687487';ctx.font='700 18px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('你會做出一樣的選擇嗎？',76,1280);
+  ctx.fillStyle='#f7f8fb';ctx.font='900 22px -apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif';
+  ctx.fillText('WHAT IF? · 挑戰朋友',76,1318);
+
+  holder.appendChild(canvas);
+  window._shareCanvas=canvas;
+}
+function canvasBlob(canvas){
+  return new Promise(resolve=>canvas.toBlob(resolve,'image/png',.96));
+}
 async function share(){
   const e=window._ending||localEnding();
   const text=`我玩了「${state.scenario}」\n結局：${e.title}\n只有 ${e.rarity||'少數'}% 玩家走到相近結局\n你會跟我一樣嗎？`;
   const url=challengeUrl();
+  if(!window._shareCanvas)buildShareCard();
   try{
-    if(navigator.share)await navigator.share({title:'WHAT IF? 挑戰你',text,url});
-    else if(navigator.clipboard){await navigator.clipboard.writeText(text+'\n'+url);toast('挑戰連結已複製');}
-    else prompt('複製這個挑戰連結',url);
-  }catch(_){}
+    const blob=await canvasBlob(window._shareCanvas);
+    if(blob&&typeof File!=='undefined'){
+      const file=new File([blob],'what-if-result.png',{type:'image/png'});
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({title:'WHAT IF? 我的平行人生',text:text+'\n'+url,files:[file]});
+        return;
+      }
+    }
+    if(navigator.share){await navigator.share({title:'WHAT IF? 挑戰你',text,url});return;}
+    if(blob){
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='what-if-result.png';a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1200);
+    }
+    if(navigator.clipboard)await navigator.clipboard.writeText(text+'\n'+url);
+    toast('結果卡已儲存，挑戰連結也已複製');
+  }catch(err){console.warn('share failed:',err);}
 }
 function init(){
   hotCards();
