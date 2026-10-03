@@ -27,7 +27,7 @@ jobs:
         run: python scripts/sync_etf_catalog.py
       - name: Commit catalog when changed
         run: |
-          if git diff --quiet -- etf-xray/catalog.json; then
+          if [ -z "$(git status --porcelain -- etf-xray/catalog.json)" ]; then
             echo "Catalog already current"
             exit 0
           fi
