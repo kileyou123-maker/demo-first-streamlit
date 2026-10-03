@@ -10,25 +10,26 @@
 </head>
 <body>
 <div class="wrap">
-<header><div class="brand"><div class="mark">W?</div><div><b>WHAT IF?</b><small>PLAY YOUR OTHER LIFE</small></div></div><div class="pill">不用登入 · 3 分鐘一局</div></header>
+<header><div class="brand"><div class="mark">W?</div><div><b>WHAT IF?</b><small>PLAY YOUR OTHER LIFE</small></div></div><div class="pill">AI 即時生成 · 不用下載</div></header>
 
 <section id="home">
-  <div class="hero"><div class="eyebrow">另一個人生，現在開始</div><h1>如果人生可以<br><i>重來一次？</i></h1><p>選一個「如果」，做 5 個決定。最後你會得到一個只有你才會走到的平行人生結局，還能丟給朋友挑戰。</p></div>
+  <div class="hero"><div class="eyebrow">另一個人生，現在開始</div><h1>如果人生可以<br><i>重來一次？</i></h1><p>選一個「如果」，AI 會根據你的每一步即時改寫下一幕。最後你會得到一個只有你才會走到的平行人生結局，還能丟給朋友挑戰。</p></div>
   <div class="hot" id="hot"></div>
   <form id="create" class="create">
     <label for="idea">或自己創造一個世界</label>
     <textarea id="idea" maxlength="70" placeholder="例如：如果我明天突然中了 10 億…"></textarea>
     <div class="create-foot"><span id="count">0 / 70</span><button class="primary" id="start" disabled>建立我的另一個人生 →</button></div>
   </form>
+  <p class="privacy-note">AI 模式第一次使用時可能會要求授權。沒有 AI 時會自動切到備援玩法，不會卡住。</p>
 </section>
 
 <section id="game" class="stage hidden">
-  <div class="stage-head"><button id="exit" class="ghost">← 離開</button><span id="roundLabel">第 1 / 5 幕</span></div>
+  <div class="stage-head"><button id="exit" class="ghost">← 離開</button><div class="stage-meta"><span id="aiMode" class="ai-badge">AI LIVE</span><span id="roundLabel">第 1 / 5 幕</span></div></div>
   <div class="progress"><i id="progress" style="width:20%"></i></div>
   <div class="world"><small>YOUR WHAT IF</small><b id="worldTitle"></b></div>
   <div class="stats" id="stats"></div>
   <div id="impact" class="impact hidden"></div>
-  <article class="scene"><span id="day" class="day">DAY 01</span><span id="big" class="big">01</span><h2 id="sceneTitle"></h2><p id="sceneText"></p></article>
+  <article class="scene"><span id="day" class="day">YEAR 00</span><span id="big" class="big">01</span><h2 id="sceneTitle"></h2><p id="sceneText"></p><div id="thinking" class="thinking hidden"><i></i><span>AI 正在改寫你的下一幕…</span></div></article>
   <div id="choices" class="choices"></div>
 </section>
 
@@ -38,11 +39,12 @@
   <div id="compare" class="compare"></div>
   <div class="timeline"><h3>你走過的 5 個決定</h3><div id="history"></div></div>
   <div class="actions"><button id="share" class="primary">挑戰朋友</button><button id="again" class="ghost">同一題再玩一次</button><button id="newLife" class="ghost">換一個人生</button></div>
-  <div class="note">朋友從你的連結進來會玩同一個題目，但可能走到完全不同的結局。</div>
+  <div class="note">朋友從你的連結進來會玩同一個題目，但 AI 會根據他的選擇走出不同故事。</div>
 </section>
-<footer>WHAT IF? · INTERACTIVE LIFE SIMULATION · MVP V2</footer>
+<footer>WHAT IF? · AI INTERACTIVE LIFE SIMULATION · MVP V3</footer>
 </div>
 <div id="toast" class="toast">已複製挑戰連結</div>
+<script src="https://js.puter.com/v2/"></script>
 <script src="app.js"></script>
 </body>
 </html>
