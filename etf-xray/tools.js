@@ -107,7 +107,7 @@ function bind(){
   $("#lockModal").addEventListener("click",e=>{if(e.target===$("#lockModal"))$("#lockModal").classList.add("hidden")});
 }
 function init(){
-  renderCredits();initQuick();populateSelects();bind();renderETFGrid();
+  renderCredits();populateSelects();bind();bindCore();renderETFGrid();updateCatalogStatus();loadCatalog();
   const h=location.hash.replace("#","");if(h&&byTicker(h))openDetail(h);
 }
 init();
